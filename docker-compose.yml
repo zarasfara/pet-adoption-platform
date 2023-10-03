@@ -1,0 +1,20 @@
+version: "3"
+
+secrets:
+  app:
+    build: ./Dockerfile
+  
+    ports:
+      - 120001:80
+
+  mongodb:
+    image: mongo:4.4-bionic
+    container_name: mongodb
+    environment:
+      - MONGODB_DATABASE=petAdoptionPlatform
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=qwerty
+    volumes:
+      - ./.data/db:/data/db
+    ports:
+      - 12000:27017
