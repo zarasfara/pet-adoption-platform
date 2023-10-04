@@ -4,14 +4,16 @@ import (
 	"log"
 
 	"github.com/zarasfara/pet-adoption-platform/internal/config"
-	v1 "github.com/zarasfara/pet-adoption-platform/internal/delivery/http"
+	"github.com/zarasfara/pet-adoption-platform/internal/delivery/http"
 	"github.com/zarasfara/pet-adoption-platform/internal/server"
 )
 
 // Run - Запуск приложения
 func Run(cfg *config.Config) {
 
-	srv := server.NewServer(cfg, v1.InitRoutes())
+	handler := http.NewHandler()
+
+	srv := server.NewServer(cfg, handler.Init())
 
 	// init database...
 
