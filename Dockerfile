@@ -2,10 +2,11 @@
 FROM golang:1.21-alpine
 
 RUN apk update \
-    && apk add --no-cache \ 
+    && apk add --no-cache \
     make \
     gcc \
-    musl-dev
+    musl-dev \
+    postgresql-client
 
 # Устанавливаем рабочую директорию внутри контейнера
 WORKDIR /app
@@ -18,6 +19,8 @@ RUN go mod download
 
 # Копируем все файлы проекта внутрь контейнера
 COPY . .
+
+RUN chmod +x ./wait-for-postgres.sh
 
 # Устанавливаем CGO_ENABLED=1
 ENV CGO_ENABLED=1

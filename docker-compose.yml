@@ -2,17 +2,21 @@ version: "3"
 
 services:
   app:
-    build: 
+    command: ./wait-for-postgres.sh postgres .bin/app
+    build:
       context: .
     ports:
-      - 12001:80
-
-  mongo:
-    image: mongo
-    restart: always
+      - "12001:80"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: secret
-      MONGO_INITDB_DATABASE: pet_adoption_platform
+      DB_DATABASE: pet_adoption_platform
+      DB_USERNAME: test
+      DB_PASSWORD: password
+
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_DB: pet_adoption_platform
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: password
     ports:
-      - 12000:27017
+      - "12000:5432"

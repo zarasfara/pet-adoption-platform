@@ -10,13 +10,15 @@ import (
 
 // Run - Запуск приложения
 func Run(cfg *config.Config) {
-
 	handler := http.NewHandler()
 
 	srv := server.NewServer(cfg, handler.Init())
 
 	// init database...
-
+	_, err := cfg.DB.NewConnection()
+	if err != nil {
+		return
+	}
 	//init handlers, repositories, services...
 
 	if err := srv.Serve(); err != nil {
