@@ -45,13 +45,13 @@ func (config *DBConfig) NewConnection() (DBConnection, error) {
 		return nil, fmt.Errorf("unsupported database type: %s", config.Type)
 	}
 
-	// create new connection
+	// Создать новое подключение
 	con, err := dbConnection.Connect()
 	if err != nil {
 		return nil, err
 	}
 
-	// AutoMigrate dtos
+	// AutoMigrate models
 	err = con.Statement.AutoMigrate(&models.User{})
 	if err != nil {
 		return nil, err

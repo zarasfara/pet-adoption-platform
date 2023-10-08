@@ -21,7 +21,7 @@ type (
 // Init инициализация структуры конфига.
 // configFile - Путь до файла конфига yml.
 func Init(configFile string) (*Config, error) {
-	// read from dotenv
+	// Чтение из dotenv
 	err := parseConfig(configFile)
 	if err != nil {
 		log.Fatalf("Cannot unmarshal yml config file: %s", err.Error())

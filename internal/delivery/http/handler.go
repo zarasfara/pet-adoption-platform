@@ -9,21 +9,22 @@ type Handler struct {
 }
 
 func NewHandler() *Handler  {
-	return &Handler{}
+	return new(Handler)
 }
 
-func (h *Handler) Init() *gin.Engine  {
+// Init инициализирует роутер и прикрепляет маршруты
+func (h *Handler) Init() *gin.Engine {
 	router := gin.Default()
-
-	// router.Use
 
 	h.initAPI(router)
 
 	return router
 }
 
+// initAPI инициализирует route группу api
 func (h *Handler) initAPI(router *gin.Engine) {
 	handlerV1 := v1.NewHandler()
+
 	api := router.Group("/api")
 	{
 		handlerV1.Init(api)

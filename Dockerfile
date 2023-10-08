@@ -31,4 +31,4 @@ RUN go build -o .bin/app ./cmd
 EXPOSE 80
 
 # Указываем команду, которая будет выполняться при запуске контейнера
-CMD ["/app/.bin/app"]
+CMD [".bin/app"]
