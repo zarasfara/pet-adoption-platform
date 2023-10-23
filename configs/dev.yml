@@ -1,2 +1,4 @@
 http:
   port: 80
+db:
+  sslmode: "prefer"
