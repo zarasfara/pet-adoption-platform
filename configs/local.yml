@@ -1,3 +1,6 @@
 http:
   port: 80
+
+db:
+  sslmode: "disable"
   
