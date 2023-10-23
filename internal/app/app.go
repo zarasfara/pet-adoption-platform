@@ -5,25 +5,28 @@ import (
 
 	"github.com/zarasfara/pet-adoption-platform/internal/config"
 	"github.com/zarasfara/pet-adoption-platform/internal/delivery/http"
+	"github.com/zarasfara/pet-adoption-platform/internal/repository"
 	"github.com/zarasfara/pet-adoption-platform/internal/server"
 )
 
 // Run - Запуск приложения
 func Run(cfg *config.Config) {
-	// чтения из dotenv
+	// Чтение из dotenv.
 	handler := http.NewHandler()
 
-	// Инициализация севера и машрутов
+	// Инициализация сервера и машрутов.
 	srv := server.NewServer(cfg, handler.Init())
 
-	// инициализация БД...
-	_, err := cfg.DB.NewConnection()
+	// Инициализация БД.
+	db, err := repository.NewPostgresDB(*cfg)
 	if err != nil {
 		log.Fatalf("error while connecting to database: %s", err)
 	}
-	// init handlers, repositories, services...
 
-	// Старт сервера
+	// todo подключение сервисиов
+	_ = repository.NewRepository(db)
+
+	// Запуск сервера.
 	if err := srv.Serve(); err != nil {
 		log.Fatalf("error while serve: %s", err)
 	}
