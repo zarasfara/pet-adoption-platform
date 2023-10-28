@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS shelters (
+    id SERIAL PRIMARY KEY,
+    region VARCHAR(255)
+);
