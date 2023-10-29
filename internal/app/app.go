@@ -1,8 +1,7 @@
 package app
 
 import (
-	"log"
-
+	"github.com/sirupsen/logrus"
 	"github.com/zarasfara/pet-adoption-platform/internal/config"
 	"github.com/zarasfara/pet-adoption-platform/internal/delivery/http"
 	"github.com/zarasfara/pet-adoption-platform/internal/repository"
@@ -20,7 +19,7 @@ func Run(cfg *config.Config) {
 	// Инициализация БД.
 	db, err := repository.NewPostgresDB(*cfg)
 	if err != nil {
-		log.Fatalf("error while connecting to database: %s", err)
+		logrus.Fatalf("error while connecting to database: %s", err)
 	}
 
 	// todo подключение сервисиов
@@ -28,6 +27,6 @@ func Run(cfg *config.Config) {
 
 	// Запуск сервера.
 	if err := srv.Serve(); err != nil {
-		log.Fatalf("error while serve: %s", err)
+		logrus.Fatalf("error while serve: %s", err)
 	}
 }

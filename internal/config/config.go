@@ -2,9 +2,9 @@ package config
 
 import (
 	"fmt"
-	"log"
 	"os"
 
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -31,14 +31,14 @@ func Init(configFile string) (*Config, error) {
 	// Чтение из dotenv
 	err := parseConfig(configFile)
 	if err != nil {
-		log.Fatalf("Cannot unmarshal yml config file: %s", err.Error())
+		logrus.Fatalf("Cannot unmarshal yml config file: %s", err.Error())
 	}
 
 	cfg := new(Config) // Создаем экземпляр структуры Config
 
 	setFromEnv(cfg)
 	if err := unmarshal(cfg); err != nil {
-		log.Fatalf("Cannot unmarshal config: %s", err.Error())
+		logrus.Fatalf("Cannot unmarshal config: %s", err.Error())
 	}
 
 	return cfg, nil
@@ -57,10 +57,10 @@ func setFromEnv(cfg *Config) {
 // Установить параметры из файла yml.
 func unmarshal(cfg *Config) error {
 	if err := viper.UnmarshalKey("http", &cfg.HTTP); err != nil {
-		log.Fatalf("Error read config: %s", err)
+		logrus.Fatalf("Error read config: %s", err)
 	}
 	if err := viper.UnmarshalKey("db", &cfg.DB); err != nil {
-		log.Fatalf("Error read config: %s", err)
+		logrus.Fatalf("Error read config: %s", err)
 	}
 
 	return nil
