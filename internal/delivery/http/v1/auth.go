@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	_ "github.com/golang-jwt/jwt/v5"
 	"github.com/zarasfara/pet-adoption-platform/internal/models"
 )
 
