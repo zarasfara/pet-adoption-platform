@@ -2,3 +2,5 @@ http:
   port: 80
 db:
   sslmode: "disable"
+auth:
+  accessTTL: 1h
