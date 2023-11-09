@@ -20,7 +20,7 @@ func Run(cfg *config.Config) {
 	// todo подключение сервисиов
 	repositories := repository.NewRepository(db)
 
-	services := service.NewService(repositories)
+	services := service.NewService(repositories, cfg)
 
 	handler := http.NewHandler(services)
 
