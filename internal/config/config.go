@@ -27,7 +27,7 @@ type (
 		SSLMode  string
 	}
 	JWTConfig struct {
-		RefreshTokenTTL time.Duration
+		AccessTokenTTL time.Duration
 		SigningToken    string
 	}
 )

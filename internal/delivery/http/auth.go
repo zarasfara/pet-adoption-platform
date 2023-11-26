@@ -1,4 +1,4 @@
-package v1
+package http
 
 import (
 	"net/http"
@@ -8,25 +8,26 @@ import (
 	"github.com/zarasfara/pet-adoption-platform/internal/models"
 )
 
-func (h Handler) InitAuthRoutes(api *gin.RouterGroup) {
-	test := api.Group("auth")
-	{
-		test.POST("/sign-up", h.signUp)
-		test.POST("/sign-in", h.signIn)
-	}
+func (h Handler) InitAuthRoutes(auth *gin.RouterGroup) {
+	auth.POST("/sign-up", h.signUp)
+	auth.POST("/sign-in", h.signIn)
 }
 
 func (h *Handler) signUp(c *gin.Context) {
 	var user models.User
 
 	if err := c.BindJSON(&user); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
 		return
 	}
 
 	err := h.services.Authorization.CreateUser(user)
 	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
 		return
 	}
 }
@@ -39,17 +40,21 @@ func (h Handler) signIn(c *gin.Context) {
 	}
 
 	if err := c.BindJSON(&body); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
 		return
 	}
 
 	token, err := h.services.Authorization.GenerateToken(body.Email, body.Password)
 	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"token": token,
+		"access_token": token,
 	})
 }

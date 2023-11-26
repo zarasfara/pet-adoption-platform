@@ -9,6 +9,7 @@ import (
 type Authorization interface {
 	CreateUser(user models.User) error
 	GenerateToken(email, password string) (token string, err error)
+	ParseToken(token string) (userId int, err error)
 }
 
 type Services struct {

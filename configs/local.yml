@@ -3,4 +3,4 @@ http:
 db:
   sslmode: "disable"
 auth:
-  accessTTL: 1h
+  accessTokenTTL: 1h
