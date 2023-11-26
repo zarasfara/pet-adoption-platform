@@ -1,6 +1,7 @@
 package http
 
 import (
+	"github.com/zarasfara/pet-adoption-platform/pkg/httputil"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -13,48 +14,62 @@ func (h Handler) InitAuthRoutes(auth *gin.RouterGroup) {
 	auth.POST("/sign-in", h.signIn)
 }
 
-func (h *Handler) signUp(c *gin.Context) {
+// @Summary	Регистрация
+// @Tags		auth
+// @Accept		json
+// @Param		model	body	models.User	true	"Регистрация пользователя"
+// @Accept		json
+// @Success	204
+// @Failure	400	{object}	httputil.HTTPError
+// @Failure	500	{object}	httputil.HTTPError
+// @Router		/auth/sign-up [post]
+func (h Handler) signUp(c *gin.Context) {
 	var user models.User
 
 	if err := c.BindJSON(&user); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+		httputil.NewHTTPErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	err := h.services.Authorization.CreateUser(user)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+		httputil.NewHTTPErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
+
+	c.JSON(http.StatusNoContent, gin.H{})
 }
 
-func (h Handler) signIn(c *gin.Context) {
+type tokenResponse struct {
+	AccessToken string `json:"accessToken"`
+}
 
-	var body struct {
-		Email    string `json:"email" binding:"required"`
-		Password string `json:"password" binding:"required"`
+// @Summary	Аутентификация
+// @Tags		auth
+// @Accept		json
+// @Produce	json
+// @Param		model	body		http.signIn.signInInput				true	"Аутентификация пользователя"
+// @Success	200		{object}	tokenResponse{accessToken=string}	"accessToken"
+// @Failure	400		{object}	httputil.HTTPError
+// @Failure	500		{object}	httputil.HTTPError
+// @Router		/auth/sign-in [post]
+func (h Handler) signIn(c *gin.Context) {
+	type signInInput struct {
+		Email    string `json:"email" binding:"required" format:"email"`
+		Password string `json:"password" binding:"required" format:"password"`
 	}
+	var body signInInput
 
 	if err := c.BindJSON(&body); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+		httputil.NewHTTPErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	token, err := h.services.Authorization.GenerateToken(body.Email, body.Password)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+		httputil.NewHTTPErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"access_token": token,
-	})
+	c.JSON(http.StatusOK, tokenResponse{AccessToken: token})
 }
