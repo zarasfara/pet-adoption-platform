@@ -17,8 +17,8 @@ func NewHandler(services *service.Services) *Handler {
 	}
 }
 
-// Init инициализует группу v1 с машрутами приложения
-func (h Handler) Init(api *gin.RouterGroup) {	
+// Init инициализирует группу v1 с маршрутами приложения
+func (h Handler) Init(api *gin.RouterGroup) {
 	v1 := api.Group("/v1")
 	{
 		v1.GET("/ping", h.ping)
@@ -26,10 +26,10 @@ func (h Handler) Init(api *gin.RouterGroup) {
 }
 
 func (h Handler) ping(c *gin.Context) {
-	id, _ := c.Get("userId") 
+	id, _ := c.Get("userId")
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "pong",
-		"user": id,
+		"user":    id,
 	})
 }

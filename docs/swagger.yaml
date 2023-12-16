@@ -1,0 +1,115 @@
+definitions:
+  http.signIn.signInInput:
+    properties:
+      email:
+        format: email
+        type: string
+      password:
+        format: password
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  http.tokenResponse:
+    properties:
+      accessToken:
+        type: string
+    type: object
+  httputil.HTTPError:
+    properties:
+      error:
+        type: string
+    type: object
+  models.User:
+    properties:
+      created_at:
+        type: string
+      email:
+        example: test@gmail.com
+        type: string
+      name:
+        example: Eugene
+        type: string
+      password:
+        example: password
+        type: string
+      preferences:
+        description: Предпочтения
+        example: some text about my preferences
+        type: string
+      updated_at:
+        type: string
+    required:
+    - email
+    - name
+    - password
+    type: object
+host: localhost:12001
+info:
+  contact:
+    email: oev2001@gmail.com
+  title: Pet adoption platform api
+  version: "1.0"
+paths:
+  /auth/sign-in:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Аутентификация пользователя
+        in: body
+        name: model
+        required: true
+        schema:
+          $ref: '#/definitions/http.signIn.signInInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: accessToken
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.tokenResponse'
+            - properties:
+                accessToken:
+                  type: string
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      summary: Аутентификация
+      tags:
+      - auth
+  /auth/sign-up:
+    post:
+      consumes:
+      - application/json
+      - application/json
+      parameters:
+      - description: Регистрация пользователя
+        in: body
+        name: model
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      summary: Регистрация
+      tags:
+      - auth
+swagger: "2.0"
