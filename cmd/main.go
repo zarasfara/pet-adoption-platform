@@ -13,6 +13,9 @@ import (
 // @version		1.0
 // @host			localhost:12001
 // @contact.email	oev2001@gmail.com
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 func main() {
 	// Загрузка из dotenv.
 	if err := godotenv.Load(); err != nil {

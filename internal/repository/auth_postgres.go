@@ -29,11 +29,23 @@ func (r AuthPostgres) CreateUser(user models.User) error {
 	return nil
 }
 
-func (r AuthPostgres) GetUser(email string) (models.User, error) {
+func (r AuthPostgres) GetUserByEmail(email string) (models.User, error) {
 	var user models.User
 
 	query := fmt.Sprintf("SELECT * FROM %s WHERE email = $1", usersTable)
 	err := r.db.Get(&user, query, email)
+	if err != nil {
+		return user, err
+	}
+
+	return user, nil
+}
+
+func (r AuthPostgres) GetUserByID(userID int) (models.User, error) {
+	var user models.User
+
+	query := fmt.Sprintf("SELECT name, email, preferences, created_at, updated_at FROM %s WHERE id = $1", usersTable)
+	err := r.db.Get(&user, query, userID)
 	if err != nil {
 		return user, err
 	}

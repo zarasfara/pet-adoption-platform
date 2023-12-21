@@ -38,7 +38,7 @@ func checkPasswordHash(password, hash string) bool {
 	return err == nil
 }
 
-func (s *AuthService) CreateUser(user models.User) error {
+func (s AuthService) CreateUser(user models.User) error {
 	hashedPassword, err := hashPassword(user.Password)
 	if err != nil {
 		return err
@@ -47,8 +47,8 @@ func (s *AuthService) CreateUser(user models.User) error {
 	return s.repo.CreateUser(user)
 }
 
-func (s *AuthService) GenerateToken(email, password string) (string, error) {
-	user, err := s.repo.GetUser(email)
+func (s AuthService) GenerateToken(email, password string) (string, error) {
+	user, err := s.repo.GetUserByEmail(email)
 	if err != nil {
 		return "", err
 	}
@@ -69,7 +69,7 @@ func (s *AuthService) GenerateToken(email, password string) (string, error) {
 	return signedToken, nil
 }
 
-func (s *AuthService) ParseToken(tokenString string) (int, error) {
+func (s AuthService) ParseToken(tokenString string) (int, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("ошибка: неверный метод токена")
@@ -91,4 +91,15 @@ func (s *AuthService) ParseToken(tokenString string) (int, error) {
 	}
 
 	return int(userId), nil
+}
+
+
+func (s AuthService) GetCurrentUser(userID int) (models.User, error) {
+
+	user, err :=s.repo.GetUserByID(userID)
+	if err != nil {
+		return models.User{}, err
+	}
+	
+	return user, nil
 }
