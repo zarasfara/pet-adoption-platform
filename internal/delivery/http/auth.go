@@ -84,19 +84,13 @@ func (h Handler) signIn(c *gin.Context) {
 // @Failure 500 {object} httputil.HTTPError
 // @Router /auth/current-user [get]
 func (h Handler) getCurrentUser(c *gin.Context) {
-	userId, exists := c.Get("userId")
-	if !exists {
+	userId := c.GetInt("userId")
+	if userId != 0 {
 		httputil.NewHTTPErrorResponse(c, http.StatusBadRequest, "not authenticated")
 		return
 	}
 
-	userIdInt, ok := userId.(int)
-	if !ok {
-		httputil.NewHTTPErrorResponse(c, http.StatusBadRequest, "invalid user ID")
-		return
-	}
-
-	user, err := h.services.Authorization.GetCurrentUser(userIdInt)
+	user, err := h.services.Authorization.GetCurrentUser(userId)
 	if err != nil {
 		httputil.NewHTTPErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
