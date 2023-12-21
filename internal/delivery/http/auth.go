@@ -12,6 +12,7 @@ import (
 func (h Handler) InitAuthRoutes(auth *gin.RouterGroup) {
 	auth.POST("/sign-up", h.signUp)
 	auth.POST("/sign-in", h.signIn)
+	auth.GET("/current-user", h.userIdentity, h.getCurrentUser)
 }
 
 // @Summary	Регистрация
@@ -72,4 +73,34 @@ func (h Handler) signIn(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, tokenResponse{AccessToken: token})
+}
+
+// @Summary Получить текущего пользователя
+// @Tags auth
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} models.User "Текущий пользователь"
+// @Failure 401 {object} httputil.HTTPError
+// @Failure 500 {object} httputil.HTTPError
+// @Router /auth/current-user [get]
+func (h Handler) getCurrentUser(c *gin.Context) {
+	userId, exists := c.Get("userId")
+	if !exists {
+		httputil.NewHTTPErrorResponse(c, http.StatusBadRequest, "not authenticated")
+		return
+	}
+
+	userIdInt, ok := userId.(int)
+	if !ok {
+		httputil.NewHTTPErrorResponse(c, http.StatusBadRequest, "invalid user ID")
+		return
+	}
+
+	user, err := h.services.Authorization.GetCurrentUser(userIdInt)
+	if err != nil {
+		httputil.NewHTTPErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
 }

@@ -23,7 +23,7 @@ definitions:
     type: object
   models.User:
     properties:
-      created_at:
+      createdAt:
         type: string
       email:
         example: test@gmail.com
@@ -38,7 +38,7 @@ definitions:
         description: Предпочтения
         example: some text about my preferences
         type: string
-      updated_at:
+      updatedAt:
         type: string
     required:
     - email
@@ -52,6 +52,28 @@ info:
   title: Pet adoption platform api
   version: "1.0"
 paths:
+  /auth/current-user:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Текущий пользователь
+          schema:
+            $ref: '#/definitions/models.User'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - BearerAuth: []
+      summary: Получить текущего пользователя
+      tags:
+      - auth
   /auth/sign-in:
     post:
       consumes:
@@ -112,4 +134,9 @@ paths:
       summary: Регистрация
       tags:
       - auth
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

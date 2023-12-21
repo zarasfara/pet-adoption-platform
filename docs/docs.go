@@ -17,6 +17,42 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/auth/current-user": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Получить текущего пользователя",
+                "responses": {
+                    "200": {
+                        "description": "Текущий пользователь",
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/sign-in": {
             "post": {
                 "consumes": [
@@ -157,7 +193,7 @@ const docTemplate = `{
                 "password"
             ],
             "properties": {
-                "created_at": {
+                "createdAt": {
                     "type": "string"
                 },
                 "email": {
@@ -177,10 +213,17 @@ const docTemplate = `{
                     "type": "string",
                     "example": "some text about my preferences"
                 },
-                "updated_at": {
+                "updatedAt": {
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`
