@@ -11,6 +11,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+var _ Authorization = AuthService{}
+
 type AuthService struct {
 	repo           repository.Authorization
 	accessTokenTTL time.Duration
@@ -93,13 +95,12 @@ func (s AuthService) ParseToken(tokenString string) (int, error) {
 	return int(userId), nil
 }
 
-
 func (s AuthService) GetCurrentUser(userID int) (models.User, error) {
 
-	user, err :=s.repo.GetUserByID(userID)
+	user, err := s.repo.GetUserByID(userID)
 	if err != nil {
 		return models.User{}, err
 	}
-	
+
 	return user, nil
 }

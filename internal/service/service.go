@@ -13,12 +13,18 @@ type Authorization interface {
 	GetCurrentUser(userId int) (models.User, error)
 }
 
+type Pet interface {
+	GetAll(sortField string) ([]models.Pet, error)
+}
+
 type Services struct {
 	Authorization
+	Pet
 }
 
 func NewService(repos *repository.Repository, cfg *config.Config) *Services {
 	return &Services{
 		Authorization: NewAuthService(repos.Authorization, cfg),
+		Pet:           NewPetService(repos.Pet),
 	}
 }

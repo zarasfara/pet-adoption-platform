@@ -7,6 +7,8 @@ import (
 	"github.com/zarasfara/pet-adoption-platform/internal/models"
 )
 
+var _ Authorization = AuthPostgres{}
+
 type AuthPostgres struct {
 	db *sqlx.DB
 }

@@ -5,8 +5,8 @@ import (
 )
 
 type User struct {
-	Id          int       `json:"-" db:"id"`
-	Name        string    `json:"name" binding:"required" example:"Eugene"`
+	Id          int       `json:"-"`
+	Name        string    `json:"name" binding:"required" example:"Eugene" extensions:"string"`
 	Email       string    `json:"email" binding:"required" extensions:"string" example:"test@gmail.com"`
 	Password    string    `json:"password" binding:"required" db:"password" example:"password"`
 	Preferences *string   `json:"preferences" swaggertype:"string" example:"some text about my preferences"` // Предпочтения

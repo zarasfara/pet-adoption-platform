@@ -17,14 +17,13 @@ func Run(cfg *config.Config) {
 		logrus.Fatalf("error while connecting to database: %s", err)
 	}
 
-	// todo подключение сервисиов
 	repositories := repository.NewRepository(db)
 
 	services := service.NewService(repositories, cfg)
 
 	handler := http.NewHandler(services)
 
-	// Инициализация сервера и машрутов.
+	// Инициализация сервера и маршрутов.
 	srv := server.NewServer(cfg, handler.Init())
 
 	// Запуск сервера.
