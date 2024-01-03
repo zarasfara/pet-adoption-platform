@@ -17,6 +17,52 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/v1/pets": {
+            "get": {
+                "description": "Retrieves all pets",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "pets"
+                ],
+                "summary": "Get all pets",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Sort field",
+                        "name": "sortField",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Pet"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Pet"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/current-user": {
             "get": {
                 "security": [
@@ -38,8 +84,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/models.User"
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/httputil.HTTPError"
                         }
@@ -185,12 +231,34 @@ const docTemplate = `{
                 }
             }
         },
+        "models.Pet": {
+            "type": "object",
+            "properties": {
+                "age": {
+                    "type": "integer"
+                },
+                "breedId": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "isAvailable": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "shelterName": {
+                    "type": "string"
+                }
+            }
+        },
         "models.User": {
             "type": "object",
             "required": [
                 "email",
-                "name",
-                "password"
+                "name"
             ],
             "properties": {
                 "createdAt": {
@@ -203,10 +271,6 @@ const docTemplate = `{
                 "name": {
                     "type": "string",
                     "example": "Eugene"
-                },
-                "password": {
-                    "type": "string",
-                    "example": "password"
                 },
                 "preferences": {
                     "description": "Предпочтения",

@@ -9,7 +9,7 @@ import (
 	"github.com/zarasfara/pet-adoption-platform/internal/service"
 )
 
-// Run - Запуск приложения
+// Run runs the application
 func Run(cfg *config.Config) {
 	// Инициализация БД.
 	db, err := repository.NewPostgresDB(*cfg)

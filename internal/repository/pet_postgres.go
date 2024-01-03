@@ -24,7 +24,8 @@ func (p PetPostgres) GetAll(sortField string) ([]models.Pet, error) {
 		query += fmt.Sprintf(" ORDER BY %s", sortField)
 	}
 
-	var pets []models.Pet
+	pets := make([]models.Pet, 0)
+
 	err := p.db.Select(&pets, query)
 	if err != nil {
 		return nil, err
@@ -33,6 +34,6 @@ func (p PetPostgres) GetAll(sortField string) ([]models.Pet, error) {
 	return pets, nil
 }
 
-func NewPet(db *sqlx.DB) *PetPostgres {
+func NewPetPostgres(db *sqlx.DB) *PetPostgres {
 	return &PetPostgres{db: db}
 }

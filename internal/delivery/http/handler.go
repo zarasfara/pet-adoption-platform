@@ -37,7 +37,7 @@ func (h Handler) initAPI(router *gin.Engine) {
 		h.InitAuthRoutes(auth)
 	}
 
-	api := router.Group("/api", h.userIdentity)
+	api := router.Group("/api")
 	{
 		handlerV1.Init(api)
 	}

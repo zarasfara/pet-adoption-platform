@@ -9,13 +9,13 @@ import (
 	"github.com/zarasfara/pet-adoption-platform/internal/config"
 )
 
-// @title			Pet adoption platform api
-// @version		1.0
-// @host			localhost:12001
-// @contact.email	oev2001@gmail.com
-// @securityDefinitions.apikey BearerAuth
-// @in header
-// @name Authorization
+//	@title						Pet adoption platform api
+//	@version					1.0
+//	@host						localhost:12001
+//	@contact.email				oev2001@gmail.com
+//	@securityDefinitions.apikey	BearerAuth
+//	@in							header
+//	@name						Authorization
 func main() {
 	// Загрузка из dotenv.
 	if err := godotenv.Load(); err != nil {

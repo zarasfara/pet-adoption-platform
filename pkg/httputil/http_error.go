@@ -5,12 +5,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-const (
-	EmptyResponseError = "no result for query"
-)
-
 type HTTPError struct {
-	Error string `json:"error"`
+	ErrorMessage string `json:"error"`
 }
 
 func NewHTTPErrorResponse(c *gin.Context, statusCode int, message string) {

@@ -21,6 +21,21 @@ definitions:
       error:
         type: string
     type: object
+  models.Pet:
+    properties:
+      age:
+        type: integer
+      breedId:
+        type: string
+      description:
+        type: string
+      isAvailable:
+        type: boolean
+      name:
+        type: string
+      shelterName:
+        type: string
+    type: object
   models.User:
     properties:
       createdAt:
@@ -31,9 +46,6 @@ definitions:
       name:
         example: Eugene
         type: string
-      password:
-        example: password
-        type: string
       preferences:
         description: Предпочтения
         example: some text about my preferences
@@ -43,7 +55,6 @@ definitions:
     required:
     - email
     - name
-    - password
     type: object
 host: localhost:12001
 info:
@@ -52,6 +63,36 @@ info:
   title: Pet adoption platform api
   version: "1.0"
 paths:
+  /api/v1/pets:
+    get:
+      description: Retrieves all pets
+      parameters:
+      - description: Sort field
+        in: query
+        name: sortField
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Pet'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            items:
+              $ref: '#/definitions/models.Pet'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      summary: Get all pets
+      tags:
+      - pets
   /auth/current-user:
     get:
       produces:
@@ -61,8 +102,8 @@ paths:
           description: Текущий пользователь
           schema:
             $ref: '#/definitions/models.User'
-        "401":
-          description: Unauthorized
+        "400":
+          description: Bad Request
           schema:
             $ref: '#/definitions/httputil.HTTPError'
         "500":
