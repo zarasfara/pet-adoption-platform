@@ -1,5 +1,5 @@
-# Используем официальный образ Golang в качестве базового
-FROM golang:1.21-alpine
+# Stage 1
+FROM golang:1.21-alpine AS build-stage
 
 RUN apk update \
     && apk add --no-cache \
@@ -8,27 +8,25 @@ RUN apk update \
     musl-dev \
     postgresql-client
 
-# Устанавливаем рабочую директорию внутри контейнера
 WORKDIR /app
 
-# Копируем файлы go.mod и go.sum внутрь контейнера
 COPY go.mod go.sum ./
-
-# Загружаем зависимости
 RUN go mod download
 
-# Копируем все файлы проекта внутрь контейнера
 COPY . .
-
 RUN chmod +x ./wait-for-postgres.sh
+RUN CGO_ENABLED=0 GOOS=linux go build -o ./bin/app ./cmd/main.go
 
-# Устанавливаем CGO_ENABLED=1
-ENV CGO_ENABLED=1
+# Stage 2
+FROM alpine as run-stage
 
-# Собираем приложение
-RUN go build -o .bin/app ./cmd
+RUN apk update && apk add --no-cache postgresql-client
+WORKDIR /
+COPY --from=build-stage /app/bin/app /app
+COPY --from=build-stage /app/configs /configs
+COPY --from=build-stage /app/wait-for-postgres.sh /
+COPY --from=build-stage /app/.env /
 
 EXPOSE 80
 
-# Указываем команду, которая будет выполняться при запуске контейнера
-CMD [".bin/app"]
+CMD ["app"]

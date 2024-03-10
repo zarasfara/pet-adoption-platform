@@ -44,7 +44,7 @@ func checkPasswordHash(password, hash string) bool {
 	return err == nil
 }
 
-func (s AuthService) CreateUser(user models.User) error {
+func (s AuthService) CreateUser(user models.AddRecordUser) error {
 	hashedPassword, err := hashPassword(user.Password)
 	if err != nil {
 		return err

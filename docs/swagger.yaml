@@ -21,6 +21,25 @@ definitions:
       error:
         type: string
     type: object
+  models.AddRecordUser:
+    properties:
+      email:
+        example: test@gmail.com
+        type: string
+      name:
+        example: Eugene
+        type: string
+      password:
+        example: password
+        type: string
+      preferences:
+        example: some text about my preferences
+        type: string
+    required:
+    - email
+    - name
+    - password
+    type: object
   models.Pet:
     properties:
       age:
@@ -47,7 +66,6 @@ definitions:
         example: Eugene
         type: string
       preferences:
-        description: Предпочтения
         example: some text about my preferences
         type: string
       updatedAt:
@@ -160,7 +178,7 @@ paths:
         name: model
         required: true
         schema:
-          $ref: '#/definitions/models.User'
+          $ref: '#/definitions/models.AddRecordUser'
       responses:
         "204":
           description: No Content

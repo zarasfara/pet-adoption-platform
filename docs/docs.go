@@ -173,7 +173,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/models.AddRecordUser"
                         }
                     }
                 ],
@@ -231,6 +231,32 @@ const docTemplate = `{
                 }
             }
         },
+        "models.AddRecordUser": {
+            "type": "object",
+            "required": [
+                "email",
+                "name",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "test@gmail.com"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Eugene"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "password"
+                },
+                "preferences": {
+                    "type": "string",
+                    "example": "some text about my preferences"
+                }
+            }
+        },
         "models.Pet": {
             "type": "object",
             "properties": {
@@ -273,7 +299,6 @@ const docTemplate = `{
                     "example": "Eugene"
                 },
                 "preferences": {
-                    "description": "Предпочтения",
                     "type": "string",
                     "example": "some text about my preferences"
                 },

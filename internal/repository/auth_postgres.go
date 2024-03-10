@@ -19,11 +19,11 @@ func NewAuthPostgres(db *sqlx.DB) *AuthPostgres {
 	}
 }
 
-func (r AuthPostgres) CreateUser(user models.User) error {
+func (r AuthPostgres) CreateUser(user models.AddRecordUser) error {
 
-	query := fmt.Sprintf("INSERT INTO %s (name, email, password) VALUES ($1, $2, $3)", usersTable)
+	query := fmt.Sprintf("INSERT INTO %s (name, email, password, preferences) VALUES ($1, $2, $3, $4)", usersTable)
 
-	_, err := r.db.Exec(query, user.Name, user.Email, user.Password)
+	_, err := r.db.Exec(query, user.Name, user.Email, user.Password, user.Preferences)
 	if err != nil {
 		return err
 	}

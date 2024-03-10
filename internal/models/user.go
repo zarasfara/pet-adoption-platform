@@ -9,7 +9,14 @@ type User struct {
 	Name        string    `json:"name" binding:"required" example:"Eugene" extensions:"string"`
 	Email       string    `json:"email" binding:"required" extensions:"string" example:"test@gmail.com"`
 	Password    string    `json:"-" binding:"required" db:"password" example:"password"`
-	Preferences *string   `json:"preferences" swaggertype:"string" example:"some text about my preferences"` // Предпочтения
+	Preferences *string   `json:"preferences" db:"preferences" swaggertype:"string" example:"some text about my preferences"`
 	CreatedAt   time.Time `json:"createdAt" db:"created_at"`
 	UpdatedAt   time.Time `json:"updatedAt" db:"updated_at"`
+}
+
+type AddRecordUser struct {
+	Name        string    `json:"name" binding:"required" example:"Eugene" extensions:"string"`
+	Email       string    `json:"email" binding:"required" extensions:"string" example:"test@gmail.com"`
+	Password    string    `json:"password" binding:"required" db:"password" example:"password"`
+	Preferences *string   `json:"preferences" swaggertype:"string" example:"some text about my preferences"`
 }

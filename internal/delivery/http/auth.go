@@ -18,14 +18,14 @@ func (h Handler) InitAuthRoutes(auth *gin.RouterGroup) {
 // @Summary	Регистрация
 // @Tags		auth
 // @Accept		json
-// @Param		model	body	models.User	true	"Регистрация пользователя"
+// @Param		model	body	models.AddRecordUser	true	"Регистрация пользователя"
 // @Accept		json
 // @Success	204
 // @Failure	400	{object}	httputil.HTTPError
 // @Failure	500	{object}	httputil.HTTPError
 // @Router		/auth/sign-up [post]
 func (h Handler) signUp(c *gin.Context) {
-	var user models.User
+	var user models.AddRecordUser
 
 	if err := c.BindJSON(&user); err != nil {
 		httputil.NewHTTPErrorResponse(c, http.StatusBadRequest, err.Error())
