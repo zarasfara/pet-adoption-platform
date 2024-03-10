@@ -11,12 +11,18 @@ type Authorization interface {
 	GetUserByID(userID int) (models.User, error)
 }
 
+type Pet interface {
+	GetAll(sortField string) ([]models.Pet, error)
+}
+
 type Repository struct {
 	Authorization
+	Pet
 }
 
 func NewRepository(db *sqlx.DB) *Repository {
 	return &Repository{
 		Authorization: NewAuthPostgres(db),
+		Pet:           NewPetPostgres(db),
 	}
 }

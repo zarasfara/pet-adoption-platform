@@ -12,8 +12,14 @@ migrate-down:
 migrate-create:
 	docker run -v ./migrations:/migrations migrate/migrate create -dir=/migrations -ext sql -seq create_$(name)_table
 
+migrate-fix:
+	docker run -v ./migrations:/migrations --network host migrate/migrate -path=/migrations/ -database postgres://${DB_USERNAME}:${DB_PASSWORD}@localhost:12000/${DB_DATABASE}?sslmode=disable force $(version)
+
 swag:
-	docker run -v $(shell pwd):/app -w /app ghcr.io/swaggo/swag:latest /root/swag init -g cmd/main.go
+	docker run --rm -v $(shell pwd):/app -w /app ghcr.io/swaggo/swag:latest init -g cmd/main.go
 
 swag-fmt:
-	docker run -v $(shell pwd):/app -w /app ghcr.io/swaggo/swag:latest /root/swag fmt
+	docker run --rm -v $(shell pwd):/app -w /app ghcr.io/swaggo/swag:latest fmt
+
+rebuild:
+	docker-compose up -d --no-deps --build $(service)

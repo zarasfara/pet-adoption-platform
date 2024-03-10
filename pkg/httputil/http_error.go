@@ -6,7 +6,7 @@ import (
 )
 
 type HTTPError struct {
-	Error string `json:"error"`
+	ErrorMessage string `json:"error"`
 }
 
 func NewHTTPErrorResponse(c *gin.Context, statusCode int, message string) {

@@ -75,17 +75,17 @@ func (h Handler) signIn(c *gin.Context) {
 	c.JSON(http.StatusOK, tokenResponse{AccessToken: token})
 }
 
-// @Summary Получить текущего пользователя
-// @Tags auth
-// @Produce json
-// @Security BearerAuth
-// @Success 200 {object} models.User "Текущий пользователь"
-// @Failure 401 {object} httputil.HTTPError
-// @Failure 500 {object} httputil.HTTPError
-// @Router /auth/current-user [get]
+// @Summary	Получить текущего пользователя
+// @Tags		auth
+// @Produce	json
+// @Security	BearerAuth
+// @Success	200	{object}	models.User	"Текущий пользователь"
+// @Failure	400	{object}	httputil.HTTPError
+// @Failure	500	{object}	httputil.HTTPError
+// @Router		/auth/current-user [get]
 func (h Handler) getCurrentUser(c *gin.Context) {
 	userId := c.GetInt("userId")
-	if userId != 0 {
+	if userId == 0 {
 		httputil.NewHTTPErrorResponse(c, http.StatusBadRequest, "not authenticated")
 		return
 	}

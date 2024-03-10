@@ -11,6 +11,12 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+var (
+	ErrPasswordMismatch    = errors.New("passwords do not match")
+	ErrInvalidTokenMethod  = errors.New("invalid token method")
+	ErrUserNotFound        = errors.New("user not found")
+)
+
 type AuthService struct {
 	repo           repository.Authorization
 	accessTokenTTL time.Duration
@@ -50,10 +56,10 @@ func (s AuthService) CreateUser(user models.User) error {
 func (s AuthService) GenerateToken(email, password string) (string, error) {
 	user, err := s.repo.GetUserByEmail(email)
 	if err != nil {
-		return "", err
+		return "", ErrUserNotFound
 	}
 	if !checkPasswordHash(password, user.Password) {
-		return "", errors.New("неверный пароль")
+		return "", ErrPasswordMismatch
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"exp": time.Now().Add(s.accessTokenTTL).Unix(),
@@ -72,7 +78,7 @@ func (s AuthService) GenerateToken(email, password string) (string, error) {
 func (s AuthService) ParseToken(tokenString string) (int, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, errors.New("ошибка: неверный метод токена")
+			return nil, ErrInvalidTokenMethod
 		}
 		return s.signingToken, nil
 	})
@@ -82,24 +88,22 @@ func (s AuthService) ParseToken(tokenString string) (int, error) {
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok || !token.Valid {
-		return 0, errors.New("ошибка: невалидный токен")
+		return 0, jwt.ErrTokenInvalidClaims
 	}
 
 	userId, ok := claims["sub"].(float64)
 	if !ok {
-		return 0, errors.New("ошибка: неверный формат идентификатора пользователя")
+		return 0, jwt.ErrTokenInvalidSubject
 	}
 
 	return int(userId), nil
 }
 
-
 func (s AuthService) GetCurrentUser(userID int) (models.User, error) {
-
-	user, err :=s.repo.GetUserByID(userID)
+	user, err := s.repo.GetUserByID(userID)
 	if err != nil {
-		return models.User{}, err
+		return models.User{}, ErrUserNotFound
 	}
-	
+
 	return user, nil
 }
