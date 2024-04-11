@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS refreshSessions (
+    id SERIAL PRIMARY KEY,
+    userId INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    refreshToken UUID NOT NULL,
+    expiresIn BIGINT NOT NULL,
+    createdAt TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+);

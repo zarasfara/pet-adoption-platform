@@ -25,7 +25,7 @@ func (h Handler) initPetsRoutes(rg *gin.RouterGroup) {
 func (h Handler) getAllPets(c *gin.Context) {
 	sortField := c.Query("sortField")
 
-	pets, err := h.services.Pet.GetAll(sortField)
+	pets, err := h.services.Pet.PetsBySortField(sortField)
 	if err != nil {
 		httputil.NewHTTPErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return

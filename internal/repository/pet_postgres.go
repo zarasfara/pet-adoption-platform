@@ -6,13 +6,17 @@ import (
 	"github.com/zarasfara/pet-adoption-platform/internal/models"
 )
 
-var _ Pet = PetPostgres{}
+type Pet interface {
+	PetsBySortField(sortField string) ([]models.Pet, error)
+}
 
-type PetPostgres struct {
+var _ Pet = petPostgres{}
+
+type petPostgres struct {
 	db *sqlx.DB
 }
 
-func (p PetPostgres) GetAll(sortField string) ([]models.Pet, error) {
+func (p petPostgres) PetsBySortField(sortField string) ([]models.Pet, error) {
 	query := fmt.Sprintf(`
 		SELECT p.id, p.description, p.name, p.age, p.is_available, s.name AS shelter_name, b.name AS breed
 		FROM %s as p
@@ -34,6 +38,6 @@ func (p PetPostgres) GetAll(sortField string) ([]models.Pet, error) {
 	return pets, nil
 }
 
-func NewPetPostgres(db *sqlx.DB) *PetPostgres {
-	return &PetPostgres{db: db}
+func NewPetPostgres(db *sqlx.DB) *petPostgres {
+	return &petPostgres{db: db}
 }

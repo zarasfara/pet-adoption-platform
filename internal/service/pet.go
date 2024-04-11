@@ -5,14 +5,18 @@ import (
 	"github.com/zarasfara/pet-adoption-platform/internal/repository"
 )
 
-var _ Pet = PetService{}
+type Pet interface {
+	PetsBySortField(sortField string) ([]models.Pet, error)
+}
 
-type PetService struct {
+var _ Pet = petService{}
+
+type petService struct {
 	repo repository.Pet
 }
 
-func (p PetService) GetAll(sortField string) ([]models.Pet, error) {
-	pets, err := p.repo.GetAll(sortField)
+func (p petService) PetsBySortField(sortField string) ([]models.Pet, error) {
+	pets, err := p.repo.PetsBySortField(sortField)
 	if err != nil {
 		return nil, err
 	}
@@ -20,6 +24,6 @@ func (p PetService) GetAll(sortField string) ([]models.Pet, error) {
 	return pets, nil
 }
 
-func NewPetService(repo repository.Pet) *PetService {
-	return &PetService{repo: repo}
+func NewPetService(repo repository.Pet) *petService {
+	return &petService{repo: repo}
 }
