@@ -14,10 +14,9 @@ type (
 		HTTP httpConfig
 		DB   dbConfig
 		JWT  jwtConfig
-
 	}
 	httpConfig struct {
-		Port string `yaml:"port"`
+		Port   string `yaml:"port"`
 		AppUrl string
 	}
 	dbConfig struct {
@@ -29,11 +28,16 @@ type (
 		SSLMode  string
 	}
 	jwtConfig struct {
-		AccessTokenTTL time.Duration `yaml:"accessTokenTTL"`
+		AccessTokenTTL  time.Duration `yaml:"accessTokenTTL"`
 		RefreshTokenTTL time.Duration `yaml:"refreshTokenTTL"`
 		SigningToken    string
 	}
 )
+
+func (cfg dbConfig) String() string {
+	return fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
+		cfg.Host, cfg.Username, cfg.Password, cfg.Database, cfg.Port, cfg.SSLMode)
+}
 
 // Init initialize Config
 func Init(configFile string) (*Config, error) {
