@@ -1,7 +1,7 @@
-CREATE TABLE IF NOT EXISTS refreshSessions (
+CREATE TABLE IF NOT EXISTS refresh_sessions (
     id SERIAL PRIMARY KEY,
-    userId INTEGER REFERENCES users(id) ON DELETE CASCADE,
-    refreshToken UUID NOT NULL,
-    expiresIn BIGINT NOT NULL,
-    createdAt TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    refresh_token UUID NOT NULL,
+    expires_in BIGINT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );

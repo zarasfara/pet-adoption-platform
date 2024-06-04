@@ -101,11 +101,6 @@ const docTemplate = `{
         },
         "/auth/refresh-tokens": {
             "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
                 "description": "Обновляет пару токенов (access и refresh) на основе предоставленного access токена.",
                 "consumes": [
                     "application/json"
@@ -117,16 +112,6 @@ const docTemplate = `{
                     "auth"
                 ],
                 "summary": "Обновление пары токенов",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "default": "\"\"",
-                        "description": "Bearer access token",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "Возвращает новую пару токенов",
@@ -251,9 +236,6 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "accessToken": {
-                    "type": "string"
-                },
-                "refreshToken": {
                     "type": "string"
                 }
             }

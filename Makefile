@@ -1,8 +1,5 @@
 include .env
 
-init:
-	cp .env.example .env
-
 migrate-up:
 	docker run --rm -v ./migrations:/migrations --network host migrate/migrate -path=/migrations/ -database postgres://${DB_USERNAME}:${DB_PASSWORD}@localhost:12000/${DB_DATABASE}?sslmode=disable up
 
