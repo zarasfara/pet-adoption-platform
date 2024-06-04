@@ -2,18 +2,7 @@ package repository
 
 import (
 	"github.com/jmoiron/sqlx"
-	"github.com/zarasfara/pet-adoption-platform/internal/models"
 )
-
-type Authorization interface {
-	CreateUser(user models.AddRecordUser) error
-	GetUserByEmail(email string) (models.User, error)
-	GetUserByID(userID int) (models.User, error)
-}
-
-type Pet interface {
-	GetAll(sortField string) ([]models.Pet, error)
-}
 
 type Repository struct {
 	Authorization

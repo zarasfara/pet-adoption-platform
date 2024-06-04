@@ -15,6 +15,8 @@ definitions:
     properties:
       accessToken:
         type: string
+      refreshToken:
+        type: string
     type: object
   httputil.HTTPError:
     properties:
@@ -133,6 +135,35 @@ paths:
       summary: Получить текущего пользователя
       tags:
       - auth
+  /auth/refresh-tokens:
+    post:
+      consumes:
+      - application/json
+      description: Обновляет пару токенов (access и refresh) на основе предоставленного
+        access токена.
+      parameters:
+      - default: '""'
+        description: Bearer access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Возвращает новую пару токенов
+          schema:
+            $ref: '#/definitions/http.tokenResponse'
+        "400":
+          description: Не удалось обновить токены
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - BearerAuth: []
+      summary: Обновление пары токенов
+      tags:
+      - auth
   /auth/sign-in:
     post:
       consumes:
@@ -148,14 +179,9 @@ paths:
       - application/json
       responses:
         "200":
-          description: accessToken
+          description: OK
           schema:
-            allOf:
-            - $ref: '#/definitions/http.tokenResponse'
-            - properties:
-                accessToken:
-                  type: string
-              type: object
+            $ref: '#/definitions/http.tokenResponse'
         "400":
           description: Bad Request
           schema:

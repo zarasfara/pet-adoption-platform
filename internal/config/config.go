@@ -12,13 +12,15 @@ import (
 type (
 	Config struct {
 		HTTP httpConfig
-		DB   DBConfig
-		JWT  JWTConfig
+		DB   dbConfig
+		JWT  jwtConfig
+
 	}
 	httpConfig struct {
-		Port string
+		Port string `yaml:"port"`
+		AppUrl string
 	}
-	DBConfig struct {
+	dbConfig struct {
 		Database string
 		Host     string
 		Port     string
@@ -26,25 +28,25 @@ type (
 		Password string
 		SSLMode  string
 	}
-	JWTConfig struct {
-		AccessTokenTTL time.Duration
+	jwtConfig struct {
+		AccessTokenTTL time.Duration `yaml:"accessTokenTTL"`
+		RefreshTokenTTL time.Duration `yaml:"refreshTokenTTL"`
 		SigningToken    string
 	}
 )
 
-// Init инициализация структуры конфига.
+// Init initialize Config
 func Init(configFile string) (*Config, error) {
-	// Чтение из dotenv
 	err := parseConfig(configFile)
 	if err != nil {
-		logrus.Fatalf("Cannot unmarshal yml config file: %s", err.Error())
+		logrus.Fatalf("cannot unmarshal yml config file: %s", err.Error())
 	}
 
-	cfg := new(Config) // Создаем экземпляр структуры Config
+	cfg := new(Config)
 
 	setFromEnv(cfg)
 	if err := unmarshal(cfg); err != nil {
-		logrus.Fatalf("Cannot unmarshal config: %s", err.Error())
+		logrus.Fatalf("cannot unmarshal config: %s", err.Error())
 	}
 
 	return cfg, nil
@@ -52,27 +54,29 @@ func Init(configFile string) (*Config, error) {
 
 // Установить параметры из файла dotenv.
 func setFromEnv(cfg *Config) {
-	// database
-	cfg.DB.Database = os.Getenv("DB_DATABASE")
-	cfg.DB.Username = os.Getenv("DB_USERNAME")
-	cfg.DB.Password = os.Getenv("DB_PASSWORD")
-	cfg.DB.Host = os.Getenv("DB_HOST")
-	cfg.DB.Port = os.Getenv("DB_PORT")
+	cfg.DB = dbConfig{
+		Database: os.Getenv("DB_DATABASE"),
+		Username: os.Getenv("DB_USERNAME"),
+		Password: os.Getenv("DB_PASSWORD"),
+		Host:     os.Getenv("DB_HOST"),
+		Port:     os.Getenv("DB_PORT"),
+	}
 
-	// authentication
+	cfg.HTTP.AppUrl = os.Getenv("APP_URL")
+
 	cfg.JWT.SigningToken = os.Getenv("SIGNING_TOKEN")
 }
 
 // Установить параметры из файла yml.
 func unmarshal(cfg *Config) error {
 	if err := viper.UnmarshalKey("http", &cfg.HTTP); err != nil {
-		logrus.Fatalf("Error read config: %s", err.Error())
+		logrus.Fatalf("error reading HTTP config: %s", err.Error())
 	}
 	if err := viper.UnmarshalKey("db", &cfg.DB); err != nil {
-		logrus.Fatalf("Error read config: %s", err.Error())
+		logrus.Fatalf("error reading DB config: %s", err.Error())
 	}
 	if err := viper.UnmarshalKey("auth", &cfg.JWT); err != nil {
-		logrus.Fatalf("Error read config: %s", err.Error())
+		logrus.Fatalf("error reading JWT config: %s", err.Error())
 	}
 
 	return nil

@@ -11,7 +11,6 @@ import (
 
 // Run runs the application
 func Run(cfg *config.Config) {
-	// Инициализация БД.
 	db, err := repository.NewPostgresDB(*cfg)
 	if err != nil {
 		logrus.Fatalf("error while connecting to database: %s", err)
@@ -21,12 +20,10 @@ func Run(cfg *config.Config) {
 
 	services := service.NewService(repositories, cfg)
 
-	handler := http.NewHandler(services)
+	handler := http.NewHandler(services, cfg.HTTP.AppUrl, cfg.JWT.RefreshTokenTTL)
 
-	// Инициализация сервера и маршрутов.
 	srv := server.NewServer(cfg, handler.Init())
 
-	// Запуск сервера.
 	if err := srv.Serve(); err != nil {
 		logrus.Fatalf("error while serve: %s", err)
 	}

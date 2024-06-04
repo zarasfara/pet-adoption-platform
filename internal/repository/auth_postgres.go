@@ -7,19 +7,25 @@ import (
 	"github.com/zarasfara/pet-adoption-platform/internal/models"
 )
 
-var _ Authorization = AuthPostgres{}
+type Authorization interface {
+	CreateUser(user models.AddRecordUser) error
+	UserByEmail(email string) (models.User, error)
+	UserByID(userID int) (models.User, error)
+}
 
-type AuthPostgres struct {
+var _ Authorization = authPostgres{}
+
+type authPostgres struct {
 	db *sqlx.DB
 }
 
-func NewAuthPostgres(db *sqlx.DB) *AuthPostgres {
-	return &AuthPostgres{
+func NewAuthPostgres(db *sqlx.DB) *authPostgres {
+	return &authPostgres{
 		db: db,
 	}
 }
 
-func (r AuthPostgres) CreateUser(user models.AddRecordUser) error {
+func (r authPostgres) CreateUser(user models.AddRecordUser) error {
 
 	query := fmt.Sprintf("INSERT INTO %s (name, email, password, preferences) VALUES ($1, $2, $3, $4)", usersTable)
 
@@ -31,7 +37,7 @@ func (r AuthPostgres) CreateUser(user models.AddRecordUser) error {
 	return nil
 }
 
-func (r AuthPostgres) GetUserByEmail(email string) (models.User, error) {
+func (r authPostgres) UserByEmail(email string) (models.User, error) {
 	var user models.User
 
 	query := fmt.Sprintf("SELECT * FROM %s WHERE email = $1", usersTable)
@@ -43,7 +49,7 @@ func (r AuthPostgres) GetUserByEmail(email string) (models.User, error) {
 	return user, nil
 }
 
-func (r AuthPostgres) GetUserByID(userID int) (models.User, error) {
+func (r authPostgres) UserByID(userID int) (models.User, error) {
 	var user models.User
 
 	query := fmt.Sprintf("SELECT name, email, preferences, created_at, updated_at FROM %s WHERE id = $1", usersTable)

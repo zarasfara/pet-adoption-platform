@@ -1,6 +1,8 @@
 package http
 
 import (
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
@@ -9,18 +11,26 @@ import (
 	"github.com/zarasfara/pet-adoption-platform/internal/service"
 )
 
-type Handler struct {
+type handler struct {
 	services *service.Services
+	appURL   string
+	refreshTokenTTL time.Duration
 }
 
-func NewHandler(services *service.Services) *Handler {
-	return &Handler{
+func NewHandler(
+	services *service.Services, 
+	appURL string, 
+	refreshTokenTTL time.Duration,
+	) *handler {
+	return &handler{
 		services: services,
+		appURL: appURL,
+		refreshTokenTTL: refreshTokenTTL,
 	}
 }
 
 // Init инициализирует роутер и прикрепляет маршруты
-func (h Handler) Init() *gin.Engine {
+func (h handler) Init() *gin.Engine {
 	router := gin.Default()
 
 	h.initAPI(router)
@@ -29,7 +39,7 @@ func (h Handler) Init() *gin.Engine {
 }
 
 // initAPI инициализирует route группу api
-func (h Handler) initAPI(router *gin.Engine) {
+func (h handler) initAPI(router *gin.Engine) {
 	handlerV1 := v1.NewHandler(h.services)
 
 	auth := router.Group("/auth")
