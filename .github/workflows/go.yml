@@ -32,6 +32,9 @@ jobs:
     - name: Test
       run: go test -v ./...
 
+    - name: Copy .env.example to .env
+      run: cp .env.example .env
+
     - name: Build Docker image
       run: docker build -t myapp:latest .
 
