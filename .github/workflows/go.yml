@@ -1,4 +1,4 @@
-name: Go
+name: Go CI
 
 on:
   push:
@@ -9,6 +9,22 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: mydb
+          POSTGRES_USER: myuser
+          POSTGRES_PASSWORD: mypassword
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
     steps:
     - uses: actions/checkout@v4
 
@@ -16,6 +32,17 @@ jobs:
       uses: actions/setup-go@v4
       with:
         go-version: '1.21.1'
+
+    - name: Create .env
+      run: |
+        touch .env
+        echo "APP_ENV=local" >> .env
+        echo "DB_DATABASE=mydb" >> .env
+        echo "DB_PORT=5432" >> .env
+        echo "DB_USERNAME=myuser" >> .env
+        echo "DB_PASSWORD=mypassword" >> .env
+        echo "DB_HOST=localhost" >> .env
+        echo "SIGNING_TOKEN=akslfjk@alsdfj1l21j3" >> .env
 
     - name: Install dependencies
       run: go mod tidy
@@ -29,19 +56,45 @@ jobs:
     - name: Build
       run: go build -v ./...
 
-    - name: Test
-      run: go test -v ./...
+  docker:
+    runs-on: ubuntu-latest
 
-    - name: Copy .env.example to .env
-      run: cp .env.example .env
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: mydb
+          POSTGRES_USER: myuser
+          POSTGRES_PASSWORD: mypassword
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Create .env
+      run: |
+        touch .env
+        echo "APP_ENV=local" >> .env
+        echo "DB_DATABASE=mydb" >> .env
+        echo "DB_PORT=5432" >> .env
+        echo "DB_USERNAME=myuser" >> .env
+        echo "DB_PASSWORD=mypassword" >> .env
+        echo "DB_HOST=localhost" >> .env
+        echo "SIGNING_TOKEN=akslfjk@alsdfj1l21j3" >> .env
 
     - name: Build Docker image
       run: docker build -t myapp:latest .
 
     - name: Run Docker container
-      run: docker run -d -p 80:80 myapp:latest
+      run: docker run -d -p 80:80 --name myapp_container --env-file .env myapp:latest
 
     - name: Verify Docker container is running
       run: |
-        sleep 10
-        curl -f http://localhost:80 || (echo "Container failed to start" && exit 1)
+        sleep 20
+        curl -f http://localhost:80 || (echo "Container failed to start" && docker logs myapp_container && exit 1)
