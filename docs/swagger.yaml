@@ -15,8 +15,6 @@ definitions:
     properties:
       accessToken:
         type: string
-      refreshToken:
-        type: string
     type: object
   httputil.HTTPError:
     properties:
@@ -141,13 +139,6 @@ paths:
       - application/json
       description: Обновляет пару токенов (access и refresh) на основе предоставленного
         access токена.
-      parameters:
-      - default: '""'
-        description: Bearer access token
-        in: header
-        name: Authorization
-        required: true
-        type: string
       produces:
       - application/json
       responses:
@@ -159,8 +150,6 @@ paths:
           description: Не удалось обновить токены
           schema:
             $ref: '#/definitions/httputil.HTTPError'
-      security:
-      - BearerAuth: []
       summary: Обновление пары токенов
       tags:
       - auth

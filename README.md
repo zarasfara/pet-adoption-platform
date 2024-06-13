@@ -9,8 +9,15 @@ git clone git@github.com:zarasfara/pet-adoption-platform.git
 ```
 
 Run command:
+
+Linux/Mac:
 ```sh
-make init
+cp .env.example .env
+```
+
+Windows:
+```sh
+copy .env.example .env
 ```
 
 Set credentials in .env

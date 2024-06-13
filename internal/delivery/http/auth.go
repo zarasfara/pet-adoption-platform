@@ -10,7 +10,7 @@ import (
 	"github.com/zarasfara/pet-adoption-platform/internal/models"
 )
 
-const refreshTokenKey = "refreshToken"
+const refreshTokenKey string = "refreshToken"
 
 func (h handler) InitAuthRoutes(auth *gin.RouterGroup) {
 	auth.POST("/sign-up", h.signUp)
@@ -59,10 +59,12 @@ type tokenResponse struct {
 // @Failure	500		{object}	httputil.HTTPError
 // @Router		/auth/sign-in [post]
 func (h handler) signIn(c *gin.Context) {
+	
 	type signInInput struct {
 		Email    string `json:"email" binding:"required" format:"email"`
 		Password string `json:"password" binding:"required" format:"password"`
 	}
+
 	var body signInInput
 
 	if err := c.BindJSON(&body); err != nil {
@@ -92,7 +94,6 @@ func (h handler) signIn(c *gin.Context) {
 // @Tags		auth
 // @Accept		json
 // @Produce		json
-// @Security		BearerAuth
 // @Success		200		{object}	tokenResponse	"Возвращает новую пару токенов"
 // @Failure		400		{object}	httputil.HTTPError	"Не удалось обновить токены"
 // @Router		/auth/refresh-tokens [post]
@@ -112,7 +113,13 @@ func (h handler) refreshTokens(c *gin.Context) {
 	// delete old refresh token
 	c.SetCookie(refreshTokenKey, "", -1, "/auth", h.appURL, false, true)
 
-	c.SetCookie(refreshTokenKey, newRefreshToken, int(h.refreshTokenTTL.Seconds())+60, "/auth", h.appURL, false, true)
+	c.SetCookie(refreshTokenKey, newRefreshToken,
+		int(h.refreshTokenTTL.Seconds())+60, 
+		"/auth", 
+		h.appURL, 
+		false, 
+		true,
+	)
 
 	c.JSON(http.StatusOK, gin.H{
 		"accessToken": newAccessToken,

@@ -10,6 +10,7 @@ import (
 	"github.com/zarasfara/pet-adoption-platform/internal/models"
 	"github.com/zarasfara/pet-adoption-platform/internal/repository"
 	"github.com/zarasfara/pet-adoption-platform/pkg/auth"
+	"github.com/google/uuid"
 )
 
 var (
@@ -21,7 +22,6 @@ var (
 type Authorization interface {
 	CreateUser(user models.AddRecordUser) error
 	SignIn(email, password string) (string, string, error)
-	ParseToken(token string) (jwt.Claims, error)
 	UserByID(userId int) (models.User, error)
 	RegenerateTokens(token string) (accessToken string, refreshToken string, err error)
 	UserIDFromToken(accessToken string) (int, error)
@@ -55,8 +55,8 @@ func (s authService) CreateUser(user models.AddRecordUser) error {
 func (s authService) generateAccessToken(userId int) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{
 		ExpiresAt: jwt.NewNumericDate(time.Now().Add(s.accessTokenTTL)),
-		IssuedAt: jwt.NewNumericDate(time.Now()),
-		Subject: strconv.Itoa(userId),
+		IssuedAt:  jwt.NewNumericDate(time.Now()),
+		Subject:   strconv.Itoa(userId),
 	})
 
 	signedToken, err := token.SignedString(s.signingToken)
@@ -68,18 +68,19 @@ func (s authService) generateAccessToken(userId int) (string, error) {
 }
 
 func (s authService) generateRefreshToken(userId int) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(s.refreshTokenTTL)),
-		IssuedAt: jwt.NewNumericDate(time.Now()),
-		Subject: strconv.Itoa(userId),
-	})
+	session := models.RefreshSession{
+		UserId: userId,
+		RefreshToken: uuid.NewString(),
+		ExpiresIn:    time.Now().Add(s.refreshTokenTTL).Unix(),
+		CreatedAt:    time.Now(),
+	}
 
-	signedToken, err := token.SignedString(s.signingToken)
+	err := s.repo.CreateRefreshSession(session)
 	if err != nil {
 		return "", err
 	}
 
-	return signedToken, nil
+	return session.RefreshToken, nil
 }
 
 func (s authService) SignIn(email, password string) (string, string, error) {
@@ -119,56 +120,66 @@ func (s authService) GenerateTokens(userId int) (accessToken, refreshToken strin
 	return accessToken, refreshToken, nil
 }
 
-func (s authService) ParseToken(tokenString string) (jwt.Claims, error) {
-    token, err := jwt.ParseWithClaims(tokenString, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
-        if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-            return nil, ErrInvalidTokenMethod
-        }
-        return s.signingToken, nil
-    })
-    if err != nil {
-        return nil, err
-    }
+func (s authService) parseAccessToken(tokenString string) (jwt.Claims, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, ErrInvalidTokenMethod
+		}
+		return s.signingToken, nil
+	})
+	if err != nil {
+		return nil, err
+	}
 
-    claims, ok := token.Claims.(*jwt.RegisteredClaims)
-    if !ok || !token.Valid {
-        return nil, jwt.ErrTokenInvalidClaims
-    }
+	claims, ok := token.Claims.(*jwt.RegisteredClaims)
+	if !ok || !token.Valid {
+		return nil, jwt.ErrTokenInvalidClaims
+	}
 	return claims, nil
 }
 
 func (s authService) UserIDFromToken(accessToken string) (int, error) {
-    claims, err := s.ParseToken(accessToken)
-    if err != nil {
-        return 0, err
-    }
+	claims, err := s.parseAccessToken(accessToken)
+	if err != nil {
+		return 0, err
+	}
 
-    registeredClaims, ok := claims.(*jwt.RegisteredClaims)
-    if !ok {
-        return 0, jwt.ErrTokenInvalidClaims
-    }
+	registeredClaims, ok := claims.(*jwt.RegisteredClaims)
+	if !ok {
+		return 0, jwt.ErrTokenInvalidClaims
+	}
 
-    userID, err := strconv.Atoi(registeredClaims.Subject)
-    if err != nil {
-        return 0, err
-    }
+	userID, err := strconv.Atoi(registeredClaims.Subject)
+	if err != nil {
+		return 0, err
+	}
 
-    return userID, nil
+	return userID, nil
 }
 
-
-func (s authService) RegenerateTokens(token string) (accessToken string, refreshToken string, err error) {
-	userId, err := s.UserIDFromToken(token)
+func (s authService) RegenerateTokens(refreshToken string) (access string, refresh string, err error) {
+	// получаем запись рефреш-сессии по UUID'у рефреш токена
+	refreshSession, err := s.repo.GetRefreshSessionByUUID(refreshToken)
 	if err != nil {
 		return "", "", err
 	}
 
-	accessToken, refreshToken, err = s.GenerateTokens(userId)
+	// Сохраняем текущую рефреш-сессию в переменную и удаляет ее из таблицы
+	err = s.repo.DeleteRefreshSessionByUUID(refreshSession.RefreshToken)
+	if err != nil {
+		return "", "", nil
+	}
+
+	if time.Now().Unix() > refreshSession.ExpiresIn {
+		return "", "", errors.New("refresh token has expired")
+	}
+
+	access, refresh, err = s.GenerateTokens(refreshSession.UserId)
 	if err != nil {
 		return "", "", err
 	}
 
-	return accessToken, refreshToken, nil
+	return access, refresh, nil
 }
 
 func (s authService) UserByID(userID int) (models.User, error) {
